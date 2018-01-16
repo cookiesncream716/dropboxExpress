@@ -12,25 +12,34 @@
 
 			this.initialize = function(options){
 				return {
-					nameField: 'name',
-					linkField: 'link'
+					filesListField: 'filesList',
+					subfields: {
+						nameField: 'name',
+						linkField: 'link'
+					}
 				}
 			}
 			this.requireFields = function(options){
 				var ticketFields = {}
-				ticketFields[options.nameField] = {type: 'text', required: true}
-				ticketFields[options.linkField] = {type: 'text', required: true}
+				var filesListSubfields = {}
+				ticketFields[options.filesListField] = {
+					type: 'compound',
+					list: true,
+					fields: filesListSubfields
+				}
+				filesListSubfields[options.subfields.nameField] = {type: 'text'} 
+				filesListSubfields[options.subfields.linkField] = {type: 'text'}
 				return ticketFields
 			}
 
 			this.build = function(ticket, optionsObservee, api){
-				// change to table so can display name and link
-				var filesContainer = List()
+				var filesListField = optionsObservee.subject.filesListField
+				var filesTable = Table()
 				var buttonOptions = {
 					success: function(files){
 						console.log('files ', files)
 						files.forEach(function(file){
-							filesContainer.item(file.link)
+							filesTable.row([Text(file.name), Text(file.link)])
 						})
 					},
 					cancel: function(){
@@ -43,7 +52,26 @@
 				var button = Button()
 				button.domNode = Dropbox.createChooseButton(buttonOptions)
 
-				this.add(button, filesContainer)
+				this.add(Text('test'), button, filesTable)
+
+
+			}
+			// for some reason getStyle isn't working
+			this.getSyle = function(){
+				return Style({
+					Table: {
+						TableCell: {
+							width: 300
+						},
+						display: 'block'
+					},
+					Button: {
+						display: 'block'
+					},
+					Text: {
+						color: 'red'
+					}
+				})
 			}
 		}))
 
