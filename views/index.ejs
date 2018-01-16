@@ -35,6 +35,7 @@
 			this.build = function(ticket, optionsObservee, api){
 				var filesListField = optionsObservee.subject.filesListField
 				var filesTable = Table()
+				var linkCell
 				var buttonOptions = {
 					success: function(files){
 						console.log('files ', files)
@@ -51,11 +52,28 @@
 				}
 				var button = Button()
 				button.domNode = Dropbox.createChooseButton(buttonOptions)
+				
+				if(ticket.get(filesListField).subject.length > 0){
+					var rows = ticket.get(filesListField).subject
+					console.log('files for table ', rows)
+					rows.forEach(function(row){
+						linkCell = row.linkField
+						filesTable.row([Text(row.nameField), Text(linkCell)])
+					})
+				}
 
-				this.add(Text('test'), button, filesTable)
+				var testText = Text('1+1=2')
+				this.add(Text('test'), button, filesTable,testText)
 
+				// make the link clickable - not working (linkCell.on is not a function)
+				linkCell.on('click', function(){
+					console.log('clicked link ', linkCell)
+					// open a new page to link
+					// window.open('link')
+				})
 
 			}
+
 			// for some reason getStyle isn't working
 			this.getSyle = function(){
 				return Style({
@@ -76,8 +94,8 @@
 		}))
 
 		PluginTester.Api.Ticket.create().then(function(testTicket){
-
-			PluginTester('DropboxIntegration', {}, {ticketId: testTicket.subject._id, showEditor: true})
+			testTicket.subject.filesList = [{nameField: 'Picture of Dog', linkField: 'https://imgur.com/gallery/KGk9F'}]
+			PluginTester('DropboxIntegration', {filesListField: 'filesList', subfields: {nameField: 'name', linkField: 'link'}}, {ticketId: testTicket.subject._id, showEditor: true})
 		}).done()
    	</script>
 </html>
