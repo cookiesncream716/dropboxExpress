@@ -10,6 +10,19 @@
 		registerPlugin(proto(Gem, function(){
 			this.name = 'DropboxIntegration'
 
+			this.initialize = function(options){
+				return {
+					nameField: 'name',
+					linkField: 'link'
+				}
+			}
+			this.requireFields = function(options){
+				var ticketFields = {}
+				ticketFields[options.nameField] = {type: 'text', required: true}
+				ticketFields[options.linkField] = {type: 'text', required: true}
+				return ticketFields
+			}
+
 			this.build = function(ticket, optionsObservee, api){
 				// change to table so can display name and link
 				var filesContainer = List()
