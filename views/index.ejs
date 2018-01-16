@@ -11,11 +11,13 @@
 			this.name = 'DropboxIntegration'
 
 			this.build = function(ticket, optionsObservee, api){
+				// change to table so can display name and link
 				var filesContainer = List()
 				var buttonOptions = {
 					success: function(files){
+						console.log('files ', files)
 						files.forEach(function(file){
-							filesContainer.item(file)
+							filesContainer.item(file.link)
 						})
 					},
 					cancel: function(){
