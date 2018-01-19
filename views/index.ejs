@@ -33,18 +33,17 @@
 			}
 
 			this.build = function(ticket, optionsObservee, api){
-				// var that = this
+				var that = this
 				var filesListField = optionsObservee.subject.filesListField
-				// don't need both table and list - here now trying to make things work
 				var filesTable = Table()
-				var linkCell
-				var filesList = List() // should probably be table so can have delete option
+				// var linkCell
+				// var deleteCell
 				var buttonOptions = {
 					success: function(files){
 						console.log('files ', files)
+						// should save it to ticket rather than add it to table and then put on change event to update table
 						files.forEach(function(file){
 							filesTable.row([Text(file.name), Text(file.link), Text('Delete')])
-							filesList.item(file.name)
 						})
 					},
 					cancel: function(){
@@ -60,34 +59,31 @@
 				if(ticket.get(filesListField).subject.length > 0){
 					var rows = ticket.get(filesListField).subject
 					console.log('files for table ', rows)
-					rows.forEach(function(row){
-						linkCell = row.linkField
-						// filesTable.row([Text(row.nameField), Text(linkCell)])
-						filesTable.row([Text(row.nameField), Text(row.linkField), Button('Delete')])
-					})
-					var items = ticket.get(filesListField).subject
-					items.forEach(function(x){
-						filesList.item(x.nameField)
+					rows.forEach(function(file, i){
+						// ??how do I add index to end of 'linkCell' to make variable unique??
+						// ??or maybe I should put link at end of 'lickCell' 
+						// that.linkCell+i = row.linkField
+						// that.linkCell = file.linkField
+						that.linkCell = Text(file.linkField)
+						// console.log('linkCell = ' + that.linkCell + ' i=' + i)
+						filesTable.row([Text(file.nameField), that.linkCell, Button('Delete')])
 					})
 				}
 
 				var testText = Text('1+1=2')
-				this.add(Text('test'), button, filesTable, filesList, testText)
+				this.add(Text('test'), button, filesTable, testText)
 
-				// make the link clickable - not working (linkCell.on is not a function)
-				// linkCell.on('click', function(){
-					// console.log('clicked link ', linkCell)
-				// 	// open a new page to link
-				// 	// window.open('link')
+				// make the link clickable - but how do I know what variable it is
+				this.linkCell.on('click', function(){
+					// still need to know which specific variable was used so can find the value of it
+					console.log('clicked link ', that.linkCell.text)
+					// open a new page to link
+					window.open(that.linkCell.text)
+				})
+
+				// filesTable.on('click', function(){
+				// 	console.log('clicked filesTable ')
 				// })
-
-				filesTable.on('click', function(){
-					console.log('clicked filesTable ')
-				})
-
-				filesList.on('click', function(){
-					console.log('clicked list')
-				})
 
 			}
 
