@@ -34,16 +34,20 @@
 
 			this.build = function(ticket, optionsObservee, api){
 				var that = this
-				var filesListField = optionsObservee.subject.filesListField
-				var filesTable = Table()
-				// var linkCell
-				// var deleteCell
+				this.ticket = ticket
+				this.filesListField = optionsObservee.subject.filesListField
+				this.filesTable = Table()
+
 				var buttonOptions = {
 					success: function(files){
 						console.log('files ', files)
-						// should save it to ticket rather than add it to table and then put on change event to update table
+						// save it to the ticket 
 						files.forEach(function(file){
-							filesTable.row([Text(file.name), Text(file.link), Text('Delete')])
+							var fields = optionsObservee.subject
+							var data = {}
+							data[fields.subfields.nameField] = file.name
+							data[fields.subfields.linkField] = file.link
+							ticket.get(that.filesListField).push(data)
 						})
 					},
 					cancel: function(){
@@ -56,35 +60,33 @@
 				var button = Button()
 				button.domNode = Dropbox.createChooseButton(buttonOptions)
 				
-				if(ticket.get(filesListField).subject.length > 0){
-					var rows = ticket.get(filesListField).subject
-					console.log('files for table ', rows)
-					rows.forEach(function(file, i){
-						// ??how do I add index to end of 'linkCell' to make variable unique??
-						// ??or maybe I should put link at end of 'lickCell' 
-						// that.linkCell+i = row.linkField
-						// that.linkCell = file.linkField
-						that.linkCell = Text(file.linkField)
-						// console.log('linkCell = ' + that.linkCell + ' i=' + i)
-						filesTable.row([Text(file.nameField), that.linkCell, Button('Delete')])
-					})
+				if(ticket.get(this.filesListField).subject.length > 0){
+					this.createTable()
 				}
 
 				var testText = Text('1+1=2')
-				this.add(Text('test'), button, filesTable, testText)
+				
+				this.add(Text('test'), button, this.filesTable, testText)
 
-				// make the link clickable - but how do I know what variable it is
-				this.linkCell.on('click', function(){
-					// still need to know which specific variable was used so can find the value of it
-					console.log('clicked link ', that.linkCell.text)
-					// open a new page to link
-					window.open(that.linkCell.text)
+				// update the table when a file is added or removed
+				ticket.get(this.filesListField).on('change', function(){
+					that.createTable()
 				})
 
-				// filesTable.on('click', function(){
-				// 	console.log('clicked filesTable ')
-				// })
+			}
 
+			this.createTable = function(){
+				console.log('create Table')
+				var that = this
+				this.filesTable.remove(this.filesTable.children)
+				var rows = this.ticket.get(this.filesListField).subject
+				rows.forEach(function(data){
+					var linkCell = Text(data.link)
+					that.filesTable.row([Text(data.name), linkCell, Button('Delete')])
+					linkCell.on('click', function(){
+						window.open(linkCell.text)
+					})
+				})
 			}
 
 			// for some reason getStyle isn't working
@@ -107,7 +109,7 @@
 		}))
 
 		PluginTester.Api.Ticket.create().then(function(testTicket){
-			testTicket.subject.filesList = [{nameField: 'Picture of Dog', linkField: 'https://imgur.com/gallery/KGk9F'}, {nameField: 'Cat Picture', linkField: 'http://www.tridanim.com/free-cat-picture_free-cat_8.html'}]
+			testTicket.subject.filesList = [{name: 'Picture of Dog', link: 'https://imgur.com/gallery/KGk9F'}, {name: 'Cat Picture', link: 'http://www.tridanim.com/free-cat-picture_free-cat_8.html'}]
 			PluginTester('DropboxIntegration', {filesListField: 'filesList', subfields: {nameField: 'name', linkField: 'link'}}, {ticketId: testTicket.subject._id, showEditor: true})
 		}).done()
    	</script>
