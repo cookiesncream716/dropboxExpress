@@ -64,9 +64,7 @@
 					this.createTable()
 				}
 
-				var testText = Text('1+1=2')
-
-				this.add(Text('test'), button, this.filesTable, testText)
+				this.add(button, this.filesTable)
 
 				// update the table when a file is added or removed
 				ticket.get(this.filesListField).on('change', function(){
@@ -78,10 +76,10 @@
 			this.createTable = function(){
 				console.log('create Table')
 				var that = this
-				this.filesTable.remove(this.filesTable.children)
+				this.filesTable.remove(this.filesTable.children) // creates new table rather than adding to existing table and getting repeats
 				var rows = this.ticket.get(this.filesListField).subject
 				rows.forEach(function(data, i){
-					var linkCell = Text(data.link)
+					var linkCell = Text('link', data.link)
 					var delButton = Button('Remove')
 					that.filesTable.row([Text(data.name), linkCell, delButton])
 					linkCell.on('click', function(){
@@ -94,20 +92,24 @@
 				})
 			}
 
-			// for some reason getStyle isn't working
-			this.getSyle = function(){
+			this.getStyle = function(){
+				console.log('getStyle')
 				return Style({
-					Table: {
+					$link: {
+						color: 'rgb(52, 152, 219)'
+					},
+					Table:{
+						display: 'block',
+						marginTop: 15,
 						TableCell: {
-							width: 300
-						},
-						display: 'block'
+							minWidth: 125,
+							$$lastChild: {
+								paddingLeft: 10
+							}
+						}
 					},
 					Button: {
 						display: 'block'
-					},
-					Text: {
-						color: 'red'
 					}
 				})
 			}
