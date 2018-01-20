@@ -65,7 +65,7 @@
 				}
 
 				var testText = Text('1+1=2')
-				
+
 				this.add(Text('test'), button, this.filesTable, testText)
 
 				// update the table when a file is added or removed
@@ -80,11 +80,16 @@
 				var that = this
 				this.filesTable.remove(this.filesTable.children)
 				var rows = this.ticket.get(this.filesListField).subject
-				rows.forEach(function(data){
+				rows.forEach(function(data, i){
 					var linkCell = Text(data.link)
-					that.filesTable.row([Text(data.name), linkCell, Button('Delete')])
+					var delButton = Button('Remove')
+					that.filesTable.row([Text(data.name), linkCell, delButton])
 					linkCell.on('click', function(){
 						window.open(linkCell.text)
+					})
+					delButton.on('click', function(){
+						console.log('clicked delete index ' + i + ' ' + linkCell.text)
+						that.ticket.get(that.filesListField).splice(i, 1)
 					})
 				})
 			}
